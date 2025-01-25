@@ -1,175 +1,122 @@
-This program is a GUI-based **To-Do List Application** created using the **Tkinter** library. Here's a detailed explanation of the code:
+This code creates an **Enhanced To-Do List** application using Python's **Tkinter library**. The app allows users to manage tasks with features such as categorization, marking tasks as done, filtering, and importing/exporting tasks. Here's a detailed explanation:
 
 ---
 
-### **1. Importing Required Modules**
-```python
-import tkinter as tk
-from tkinter import messagebox
-```
-- **`tkinter`**: Provides tools to create GUI elements.
-- **`messagebox`**: Displays pop-up messages for success, warnings, or errors.
+### **1. Class Initialization**
+The `EnhancedTodoApp` class manages the application's functionality.
+
+- **`__init__` Method:**
+  - Initializes the main window (`root`), sets the title and dimensions, and creates instance variables:
+    - `TASKS_FILE`: The file where tasks are saved.
+    - `todo_list`: A list to store all tasks.
+    - `categories`: A set of task categories, initialized with `"General"`.
+  - Calls methods to create widgets (`create_widgets`), load tasks (`load_tasks`), and update the task list and category menu.
 
 ---
 
-### **2. Initialize the To-Do List**
-```python
-todo_list = []
-```
-- A list (`todo_list`) is used to store tasks as dictionaries with two keys:
-  - **`"task"`**: The task description (text).
-  - **`"done"`**: A boolean value indicating whether the task is completed (`True`) or not (`False`).
+### **2. User Interface (UI)**
+The **UI** is defined in the `create_widgets` method and consists of the following:
+
+#### a. **Task Entry Frame**
+- Contains:
+  - Task input field (`task_entry`).
+  - Category selection dropdown (`category_dropdown`) and button (`+`) to add new categories.
+  - `Add Task` button to add tasks to the list.
+
+#### b. **Task Listbox**
+- Displays tasks with a scrollbar for navigation.
+- Tasks are shown in the format:  
+  `Index. [Category] Task Description [Status]`  
+  where `[Status]` is either `✓` (completed) or `✗` (pending).
+
+#### c. **Action Buttons**
+- Buttons for managing tasks:
+  - **Mark Done**: Toggles a task's completion status.
+  - **Edit Task**: Edits an existing task.
+  - **Delete Task**: Deletes a selected task.
+  - **Export**: Exports tasks to a JSON file.
+  - **Import**: Imports tasks from a JSON file.
+
+#### d. **Filter Dropdown**
+- Filters tasks by:
+  - **All**: Displays all tasks.
+  - **Pending**: Displays only incomplete tasks.
+  - **Completed**: Displays only completed tasks.
+  - **By Category**: Filters tasks by their categories (to be implemented).
 
 ---
 
-### **3. Add Task Function**
-```python
-def add_task():
-    task = task_entry.get()  # Get text from the entry box
-    if task.strip():  # Check if the input is not empty
-        todo_list.append({"task": task, "done": False})  # Add task to the list
-        task_entry.delete(0, tk.END)  # Clear the entry field
-        update_task_list()  # Update the displayed task list
-        messagebox.showinfo("Success", f"Task '{task}' added!")  # Show success message
-    else:
-        messagebox.showwarning("Warning", "Task cannot be empty!")  # Show warning if input is empty
-```
-- Adds a task to the `todo_list` if the input is valid.
-- Clears the entry box after adding the task.
-- Updates the task list display.
-- Provides feedback using `messagebox`.
+### **3. Functionalities**
+The application provides these key functionalities:
+
+#### a. **Task Management**
+1. **Add Task (`add_task`):**
+   - Adds a task with the following details:
+     - `task`: The task description entered in the input field.
+     - `category`: The selected category.
+     - `done`: Whether the task is completed (default is `False`).
+     - `created_at`: Timestamp of task creation.
+   - Saves tasks to the file (`save_tasks`) and updates the task list (`update_task_list`).
+
+2. **Mark Task Done (`mark_task_done`):**
+   - Toggles the completion status (`done`) of a selected task.
+
+3. **Edit Task (`edit_task`):**
+   - Allows the user to modify the description of a selected task.
+
+4. **Delete Task (`delete_task`):**
+   - Removes a selected task from the list.
 
 ---
 
-### **4. Update Task List Display**
-```python
-def update_task_list():
-    task_listbox.delete(0, tk.END)  # Clear the Listbox
-    for i, task in enumerate(todo_list, start=1):
-        status = "✓" if task["done"] else "✗"  # Mark as Done or Not Done
-        task_listbox.insert(tk.END, f"{i}. {task['task']} [{status}]")  # Add task to the Listbox
-```
-- Refreshes the Listbox (`task_listbox`) to reflect changes in the `todo_list`.
-- Displays the task number, description, and status (✓ for done, ✗ for not done).
+#### b. **Filtering and Display**
+1. **Update Task List (`update_task_list`):**
+   - Updates the displayed tasks based on the selected filter:
+     - **Pending**: Displays tasks with `done = False`.
+     - **Completed**: Displays tasks with `done = True`.
+
+2. **Get Filtered Tasks (`get_filtered_tasks`):**
+   - Returns a filtered list of tasks based on the current filter.
 
 ---
 
-### **5. Mark Task as Done**
-```python
-def mark_task_done():
-    try:
-        selected_task_index = task_listbox.curselection()[0]  # Get the selected task index
-        todo_list[selected_task_index]["done"] = True  # Mark the task as done
-        update_task_list()  # Update the task list display
-        messagebox.showinfo("Success", "Task marked as done!")  # Show success message
-    except IndexError:
-        messagebox.showwarning("Warning", "Please select a task to mark as done.")  # Warn if no task is selected
-```
-- Marks the selected task as "done" by updating its `done` key to `True`.
-- Catches and handles errors if no task is selected.
+#### c. **Category Management**
+1. **Add New Category (`add_new_category`):**
+   - Prompts the user for a new category name and adds it to the category set.
+
+2. **Update Category Menu (`update_category_menu`):**
+   - Refreshes the category dropdown to include all available categories.
 
 ---
 
-### **6. Delete Task**
-```python
-def delete_task():
-    try:
-        selected_task_index = task_listbox.curselection()[0]  # Get the selected task index
-        removed_task = todo_list.pop(selected_task_index)  # Remove the task from the list
-        update_task_list()  # Update the task list display
-        messagebox.showinfo("Success", f"Task '{removed_task['task']}' deleted!")  # Show success message
-    except IndexError:
-        messagebox.showwarning("Warning", "Please select a task to delete.")  # Warn if no task is selected
-```
-- Deletes the selected task from the `todo_list`.
-- Handles errors when no task is selected.
+#### d. **Data Persistence**
+1. **Save Tasks (`save_tasks`):**
+   - Saves the current task list to a JSON file (`tasks.json`).
+
+2. **Load Tasks (`load_tasks`):**
+   - Loads tasks from the JSON file during app startup.
+   - Updates the category set based on loaded tasks.
+
+3. **Export Tasks (`export_tasks`):**
+   - Allows the user to save the current tasks to a specified JSON file.
+
+4. **Import Tasks (`import_tasks`):**
+   - Imports tasks from a selected JSON file and appends them to the current task list.
+   - Updates categories and task list after importing.
 
 ---
 
-### **7. Main Window Configuration**
-```python
-root = tk.Tk()
-root.title("To-Do List")
-root.geometry("400x500")
-```
-- Creates the main application window (`root`).
-- Sets the title as **To-Do List**.
-- Defines the window size as 400x500 pixels.
+### **4. Main Function**
+The `main` function creates the root Tkinter window and initializes the `EnhancedTodoApp` class.
 
 ---
 
-### **8. Input Section**
-```python
-entry_frame = tk.Frame(root)
-entry_frame.pack(pady=10)
-
-task_entry = tk.Entry(entry_frame, font=("Arial", 14), width=25)
-task_entry.pack(side=tk.LEFT, padx=5)
-
-add_button = tk.Button(entry_frame, text="Add Task", font=("Arial", 12), command=add_task)
-add_button.pack(side=tk.LEFT)
-```
-- **`entry_frame`**: A frame to group the entry box and the add button.
-- **`task_entry`**: An entry box where the user types the task.
-- **`add_button`**: A button to add the entered task.
+### **Key Features**
+1. **Persistent Storage**: Tasks are saved to a file and loaded upon app restart.
+2. **Filtering**: Tasks can be filtered by completion status or category.
+3. **Categorization**: Tasks can be grouped into categories.
+4. **Import/Export**: Supports exporting tasks to and importing tasks from JSON files.
 
 ---
 
-### **9. Task Display Section**
-```python
-task_listbox = tk.Listbox(root, font=("Arial", 14), height=15, width=35, selectmode=tk.SINGLE)
-task_listbox.pack(pady=20)
-```
-- **`task_listbox`**: A listbox to display the tasks with their status.
-- **`selectmode=tk.SINGLE`**: Allows only one task to be selected at a time.
-
----
-
-### **10. Action Buttons**
-```python
-button_frame = tk.Frame(root)
-button_frame.pack(pady=10)
-
-mark_done_button = tk.Button(button_frame, text="Mark Done", font=("Arial", 12), command=mark_task_done)
-mark_done_button.grid(row=0, column=0, padx=10)
-
-delete_button = tk.Button(button_frame, text="Delete Task", font=("Arial", 12), command=delete_task)
-delete_button.grid(row=0, column=1, padx=10)
-
-exit_button = tk.Button(button_frame, text="Exit", font=("Arial", 12), command=root.quit)
-exit_button.grid(row=0, column=2, padx=10)
-```
-- **Action Buttons**:
-  - **Mark Done**: Marks the selected task as done.
-  - **Delete Task**: Deletes the selected task.
-  - **Exit**: Closes the application.
-
----
-
-### **11. Run the Application**
-```python
-root.mainloop()
-```
-- Starts the Tkinter event loop to keep the application running and interactive.
-
----
-
-### **How It Works**
-1. **Adding a Task**:
-   - User types a task and clicks "Add Task."
-   - The task is added to the list and displayed.
-
-2. **Marking as Done**:
-   - User selects a task and clicks "Mark Done."
-   - The task's status changes to "✓."
-
-3. **Deleting a Task**:
-   - User selects a task and clicks "Delete Task."
-   - The task is removed from the list.
-
-4. **Exiting**:
-   - Clicking "Exit" closes the application.
-
-Would you like to enhance this app further? For example:
-- Save tasks to a file.
-- Add categories or due dates.
+This code demonstrates modular design and thoughtful integration of Tkinter components for a feature-rich to-do list application.
