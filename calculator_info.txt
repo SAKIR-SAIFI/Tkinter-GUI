@@ -1,0 +1,114 @@
+Here's an explanation of the calculator code step by step:
+
+---
+
+### **1. Importing Necessary Modules**
+```python
+import tkinter as tk
+from tkinter import messagebox
+```
+- **`tkinter`**: Provides tools to create GUI elements.
+- **`messagebox`**: Displays error messages to the user.
+
+---
+
+### **2. Defining the `on_click` Function**
+```python
+def on_click(button_text):
+    if button_text == "=":
+        try:
+            result = eval(entry.get())  # Evaluate the math expression
+            entry.delete(0, tk.END)    # Clear the input field
+            entry.insert(tk.END, str(result))  # Display the result
+        except Exception as e:
+            messagebox.showerror("Error", "Invalid Input!")  # Show error popup
+    elif button_text == "C":
+        entry.delete(0, tk.END)  # Clear the input field
+    else:
+        entry.insert(tk.END, button_text)  # Append button text to the input
+```
+- **Purpose**: Handles button actions.
+- **Actions**:
+  - If `=` is clicked, evaluate the mathematical expression using `eval()`.
+  - If `C` is clicked, clear the input field.
+  - For other buttons, add the button’s text to the input field.
+
+---
+
+### **3. Creating the Main Window**
+```python
+root = tk.Tk()
+root.title("Calculator")
+root.geometry("300x400")
+root.resizable(False, False)
+```
+- **`tk.Tk()`**: Creates the main application window.
+- **`title()`**: Sets the title of the window.
+- **`geometry()`**: Sets the window size to 300x400 pixels.
+- **`resizable(False, False)`**: Prevents resizing the window.
+
+---
+
+### **4. Entry Widget for User Input**
+```python
+entry = tk.Entry(root, font=("Arial", 18), borderwidth=2, relief="solid", justify="right")
+entry.grid(row=0, column=0, columnspan=4, ipady=10, pady=10, padx=10)
+```
+- **`tk.Entry`**: Creates a text box for input and output.
+- **`font`**: Sets the font style and size.
+- **`borderwidth` & `relief`**: Define the border's thickness and style.
+- **`justify="right"`**: Aligns text to the right.
+- **`grid()`**: Places the widget in a grid layout (top row, spanning 4 columns).
+
+---
+
+### **5. Defining Calculator Buttons**
+```python
+buttons = [
+    "7", "8", "9", "/",
+    "4", "5", "6", "*",
+    "1", "2", "3", "-",
+    "C", "0", "=", "+"
+]
+```
+- A list of button labels corresponding to numbers, operators, and actions.
+
+---
+
+### **6. Creating and Placing Buttons**
+```python
+row, col = 1, 0
+for button_text in buttons:
+    button = tk.Button(root, text=button_text, font=("Arial", 14), command=lambda bt=button_text: on_click(bt))
+    button.grid(row=row, column=col, ipadx=10, ipady=10, padx=5, pady=5, sticky="nsew")
+    col += 1
+    if col > 3:
+        col = 0
+        row += 1
+```
+- **`tk.Button`**: Creates a clickable button.
+- **`command`**: Associates each button with the `on_click` function.
+- **`grid()`**: Places buttons in rows and columns.
+- **`ipadx`/`ipady`**: Adds padding inside the button.
+- **`padx`/`pady`**: Adds spacing outside the button.
+- **`sticky="nsew"`**: Ensures the button stretches to fill its grid cell.
+
+The buttons are placed in a 4x4 grid, with numbers and operators organized logically.
+
+---
+
+### **7. Running the Application**
+```python
+root.mainloop()
+```
+- **`mainloop()`**: Starts the Tkinter event loop, keeping the window open and interactive.
+
+---
+
+### **How It Works**
+1. **User Input**: The user clicks buttons to input numbers and operators.
+2. **Display**: The clicked buttons update the `entry` widget.
+3. **Calculation**:
+   - Clicking `=` evaluates the input using `eval()`.
+   - If there’s an error, a popup appears.
+4. **Clear Input**: Clicking `C` clears the entry.
